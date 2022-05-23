@@ -34,16 +34,12 @@ Partial Public Class Client
             Friend ReasonCode As UInt32 'SubstitionData seems to contain the Reason Code for a failed logon
             Friend ReasonText As String
 
-            Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
 
             Public Sub New(ByVal DataBytes() As Byte)
-                Logger.Trace("")
                 If DataBytes.Length < 15 Then Throw New Exception("Insufficient data to construct a Signon_Info_Message")
                 Dim Data As New System.IO.MemoryStream(DataBytes)
                 Me.TextCCSID = ReadUInt32(Data)
-                Logger.Debug("TextCCSID: " & Me.TextCCSID.ToString)
                 Me.SubstitutionDataCCSID = ReadUInt32(Data)
-                Logger.Debug("SubstitutionDataCCSID: " & Me.SubstitutionDataCCSID.ToString)
                 Me.Severity = ReadUInt16(Data)
                 Dim l As UInt32 = ReadUInt32(Data)
                 ReDim Me.MessageType(l - 1)
@@ -102,7 +98,6 @@ Partial Public Class Client
                 Me.Help = System.Text.Encoding.UTF8.GetString(b).Trim
 
                 If Data.Position <> Data.Length Then
-                    Logger.Debug("!!! Some data remains in the buffer after parsing message!") 'XXX should throw here
                 End If
 
             End Sub

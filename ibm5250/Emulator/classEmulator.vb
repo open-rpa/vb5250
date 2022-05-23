@@ -43,8 +43,6 @@
     Public Event DataReady(ByVal Bytes() As Byte, ByVal OpCode As TN5250.OpCodes)
     Public Event StartupResponseReceived(ByVal ResponseCode As String)
 
-    Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger()
-
     Public Locale As Localization.Locale
     Public LocaleInfo As Localization
 
@@ -315,7 +313,6 @@
 
     Private Sub Handle_Text(ByRef text As String, ByVal Attribute As Emulator.EmulatorScreen.FieldAttribute)
         If text IsNot Nothing Then
-            Logger.Trace(vbTab & "Text: '" & text & "'")
             text = Nothing
         End If
     End Sub
@@ -363,13 +360,11 @@
                         start += 1
                         Dim Cmd As Command = CType(buf(start), Command)
                         start += 1
-                        Logger.Trace(Cmd.ToString & vbLf)
                         Select Case Cmd
 
                             'XXX lots more commands to deal with here!
 
                             Case Command.CLEAR_UNIT
-                                'Logger.Trace(Cmd.ToString & vbLf)
                                 'XXX
 
                                 'Locks the workstation keyboard
@@ -416,7 +411,6 @@
                                     Return False
                                 Else
                                     Dim Param As Byte = buf(start)
-                                    Logger.Trace(vbTab & "Param: &H" & Hex(Param))
                                     start += 1
                                     Select Case Param
                                         Case 0
@@ -458,21 +452,6 @@
 
                                     Dim cc As New EmulatorScreen.ControlCharacter(buf(start), buf(start + 1))
                                     start += 2
-                                    Logger.Trace(vbTab & "---Pre flags---")
-                                    Logger.Trace(vbTab & "Non-Stream Data: " & cc.Flags.Pre.Non_Stream_Data.ToString)
-                                    Logger.Trace(vbTab & "Null all non-bypass fields: " & cc.Flags.Pre.Null_All_Non_Bypass_Fields.ToString)
-                                    Logger.Trace(vbTab & "Null all non-bypass fields with MDT on: " & cc.Flags.Pre.Null_All_Non_Bypass_Fields_With_MDT_On.ToString)
-                                    Logger.Trace(vbTab & "Reset MDT flags in all fields: " & cc.Flags.Pre.Reset_MDT_Flags_In_All_Fields.ToString)
-                                    Logger.Trace(vbTab & "Reset MDT flags in non-bypass fields: " & cc.Flags.Pre.Reset_MDT_Flags_In_Non_Bypass_Fields.ToString)
-                                    Logger.Trace(vbTab & "Reset pending AID and lock keyboard: " & cc.Flags.Pre.Reset_Pending_AID_And_Lock_Keyboard.ToString)
-                                    Logger.Trace(vbTab & "---Post flags---")
-                                    Logger.Trace(vbTab & "Cursor moves when keyboard unlocks: " & cc.Flags.Post.Cursor_Moves_When_Keyboard_Unlocks.ToString)
-                                    Logger.Trace(vbTab & "Reset blinking cursor: " & cc.Flags.Post.Reset_Blinking_Cursor.ToString)
-                                    Logger.Trace(vbTab & "Set blinking cursor: " & cc.Flags.Post.Set_Blinking_Cursor.ToString)
-                                    Logger.Trace(vbTab & "Set message waiting indicator off: " & cc.Flags.Post.Set_Message_Waiting_Indicator_Off.ToString)
-                                    Logger.Trace(vbTab & "Set message waiting indicator on: " & cc.Flags.Post.Set_Message_Waiting_Indicator_On.ToString)
-                                    Logger.Trace(vbTab & "Sound alarm: " & cc.Flags.Post.Sound_Alarm.ToString)
-                                    Logger.Trace(vbTab & "Reset pending AID and unlock keyboard: " & cc.Flags.Post.Unlock_Keyboard_And_Reset_Pending_AID.ToString)
 
                                     If cc.Flags.Pre.Reset_Pending_AID_And_Lock_Keyboard Then
                                         Me.Keyboard.State = EmulatorKeyboard.Keyboard_State.Normal_Locked
@@ -506,9 +485,6 @@
                                                 'Dim attr As IBM5250.ColorFieldAttribute = CType(b, IBM5250.ColorFieldAttribute)
                                                 'CurrentAttribute = CType(b, IBM5250.FieldAttribute.ColorAttribute)
                                                 CurrentAttribute = New Emulator.EmulatorScreen.FieldAttribute(b, Me.Screen.DefaultForeColor, Screen.BackColor)
-                                                Logger.Trace(vbTab & "----------")
-                                                Logger.Trace(vbTab & "Attribute: " & CurrentAttribute.Attribute.ToString)
-                                                Logger.Trace(vbTab & "----------")
                                                 text += " " 'attributes are displayed as spaces
 
                                                 'attribute may apply to a field, so we need to update field attributes here.
@@ -517,8 +493,6 @@
 
                                             Else
                                                 Dim e As Byte = EBCDIC_To_UTF8(New Byte() {b})(0)
-                                                'Logger.Trace(vbTab & "Data byte: &H" & Hex(e) & vbTab & "[" & Chr(e) & "]")
-                                                'Logger.Trace(vbTab & "Data byte: [" & see.see_ebc(b) & "]")
                                                 text += Chr(e)
                                                 'ThisByteWasText = True
                                             End If
@@ -528,9 +502,6 @@
                                             If [Enum].IsDefined(GetType(EmulatorScreen.WTD_Order), b) Then
                                                 'Case 1 To 3, &H10 To &H15, &H1D 'Orders
                                                 Dim Order As EmulatorScreen.WTD_Order = CType(b, EmulatorScreen.WTD_Order)
-                                                Logger.Trace(vbTab & "----------")
-                                                Logger.Trace(vbTab & "Order: " & Order.ToString)
-                                                Logger.Trace(vbTab & "----------")
                                                 Select Case Order
                                                     Case EmulatorScreen.WTD_Order.Set_Buffer_Address
                                                         'The set buffer address (SBA) order specifies the address at which data transfer and input field definition will begin. Any location within the
@@ -539,7 +510,6 @@
                                                         Row = buf(start)
                                                         Col = buf(start + 1)
                                                         start += 2
-                                                        Logger.Trace(vbTab & vbTab & "Address: (" & Row.ToString & ", " & Col.ToString & ")")
 
                                                         If (Row > 0 And Row <= Me.Screen.Rows) And (Col > 0 And Col <= Me.Screen.Columns) Then
                                                             Screen.Row = Row
@@ -555,7 +525,6 @@
                                                         Row = buf(start)
                                                         Col = buf(start + 1)
                                                         start += 2
-                                                        Logger.Trace(vbTab & vbTab & "Address: (" & Row.ToString & ", " & Col.ToString & ")")
 
                                                         If (Row > 0 And Row <= Me.Screen.Rows) And (Col > 0 And Col <= Me.Screen.Columns) Then
                                                             Screen.HomeCoordinates.Row = Row
@@ -572,7 +541,6 @@
                                                         Row = buf(start)
                                                         Col = buf(start + 1)
                                                         start += 2
-                                                        Logger.Trace(vbTab & vbTab & "Address: (" & Row.ToString & ", " & Col.ToString & ")")
 
                                                         If (Row > 0 And Row <= Me.Screen.Rows) And (Col > 0 And Col <= Me.Screen.Columns) Then
                                                             'XXX It's unclear whether we're supposed to move now or at the end of the WTD.
@@ -596,9 +564,7 @@
                                                         Col = buf(start + 1)
                                                         c = buf(start + 2)
                                                         start += 3
-                                                        Logger.Trace(vbTab & vbTab & "Address: (" & Row.ToString & ", " & Col.ToString & ")")
                                                         Dim e As Byte = EBCDIC_To_UTF8(New Byte() {c})(0)
-                                                        Logger.Trace(vbTab & vbTab & "Character: &H" & Hex(e) & vbTab & "[" & Chr(e) & "]")
 
                                                         If (Row > 0 And Row <= Me.Screen.Rows) And (Col > 0 And Col <= Me.Screen.Columns) Then
                                                             If Screen.GetTextBufferAddress(Row, Col) >= Screen.GetTextBufferAddress() Then
@@ -620,7 +586,6 @@
                                                         Col = buf(start + 1)
                                                         ListLen = buf(start + 2)
                                                         start += 3
-                                                        Logger.Trace(vbTab & vbTab & "Address: (" & Row.ToString & ", " & Col.ToString & ")")
                                                         If (ListLen < 2) Or (ListLen > 5) Then
                                                             RaiseEvent DataStreamError(NegativeResponse.Write_Data_Length_Not_Valid)
                                                             Return False
@@ -628,7 +593,6 @@
                                                         Dim AttributeTypes(ListLen - 2) As EmulatorScreen.Erase_To_Address_Attribute_Types
                                                         For i As Integer = 0 To AttributeTypes.Length - 1
                                                             AttributeTypes(i) = buf(start)
-                                                            Logger.Trace(vbTab & vbTab & "Attribute Type: " & AttributeTypes(i).ToString)
                                                             start += 1
                                                             If (AttributeTypes(i) > EmulatorScreen.Erase_To_Address_Attribute_Types.Extended_Ideographic_Attributes) And
                                                                 (AttributeTypes(i) <> EmulatorScreen.Erase_To_Address_Attribute_Types.All) Then
@@ -663,12 +627,6 @@
                                                         End If
 
                                                         start += hdr.Length + 1 'The length byte itself is not included in the length value, so add 1
-                                                        Logger.Trace(vbTab & vbTab & "Length: " & hdr.Length.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "Flag: &H" & Hex(hdr.Flag))
-                                                        Logger.Trace(vbTab & vbTab & "Starting Field for Reads: " & hdr.Starting_Field_For_Reads.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "Error row: " & hdr.Error_Row.ToString)
-                                                        'Logger.Trace(vbTab & vbTab & "PFxx data inhibit bits: &H" & Hex(hdr.PF_Data_Inhibit))
-                                                        Logger.Trace(vbTab & vbTab & "Inhibited PFxx keys: " & String.Join(",", hdr.Inhibited_AID_Codes))
 
                                                         Me.Screen.Header = hdr
 
@@ -699,8 +657,6 @@
                                                         Dim AttrType As Byte = buf(start)
                                                         Dim Attr As Byte = buf(start + 1)
                                                         start += 2
-                                                        Logger.Trace(vbTab & vbTab & "Attribute Type: &H" & Hex(AttrType) & "(unimplemented)")
-                                                        Logger.Trace(vbTab & vbTab & "Attribute: &H" & Hex(Attr) & "(unimplemented)")
                                                         RaiseEvent DataStreamError(NegativeResponse.Extended_Attribute_Type_Not_Valid)
                                                         Return False
 
@@ -724,28 +680,12 @@
                                                         '  field in the format table in accordance with the FFW, and writes the leading and ending field attributes.
                                                         Dim hdr As New EmulatorScreen.StartOfField_Header(buf, start, Screen.DefaultForeColor, Screen.BackColor)
                                                         start += hdr.Length
-                                                        Logger.Trace(vbTab & vbTab & "Length: " & hdr.Length.ToString)
-
-                                                        Logger.Trace(vbTab & vbTab & "Field Format Word: &H" & Hex(hdr.FieldFormatWord.Raw))
-                                                        Logger.Trace(vbTab & vbTab & "    Bypass: " & hdr.FieldFormatWord.Bypass.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "    Dup or Field Mark Enable: " & hdr.FieldFormatWord.Dup_Or_Field_Mark_Enabled.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "    Modified Data Tag: " & hdr.FieldFormatWord.Modified.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "    Field Shift/Edit Spec: " & hdr.FieldFormatWord.Shift_Edit_Spec.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "    Auto Enter: " & hdr.FieldFormatWord.Auto_Enter_On_Exit.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "    Field Exit Required: " & hdr.FieldFormatWord.Field_Exit_Key_Required.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "    Monocase: " & hdr.FieldFormatWord.UpperCase.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "    Mandatory Enter: " & hdr.FieldFormatWord.Mandatory_Enter.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "    Mandatory Fill: " & hdr.FieldFormatWord.Mandatory_Fill.ToString)
 
                                                         For Each fcw As EmulatorScreen.StartOfField_Header.FCW In hdr.FieldControlWords
-                                                            Logger.Trace(vbTab & vbTab & "Field Control Word: &H" & Hex(fcw.Raw))
-                                                            Logger.Trace(vbTab & vbTab & "    Type: " & fcw.Type.ToString)
                                                             Select Case fcw.Type
                                                                 Case EmulatorScreen.StartOfField_Header.FCW_Type.Highlighted
                                                                     Dim a As New EmulatorScreen.FieldAttribute(fcw.Data)
-                                                                    Logger.Trace(vbTab & vbTab & "    Attribute: " & a.Attribute.ToString)
                                                                 Case Else
-                                                                    Logger.Trace(vbTab & vbTab & "    Data: &H" & Hex(fcw.Data))
                                                             End Select
                                                             'The first FCW of any type is used. Subsequent FCWs of the same type are ignored. 
                                                             'The 5494 does not check to determine if the FCWs are formatted correctly or if 
@@ -760,9 +700,6 @@
                                                             '    Return False
                                                             'End If
                                                         Next
-                                                        Logger.Trace(vbTab & vbTab & "Leading Field Attribute: " & hdr.LeadingFieldAttribute.Attribute.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "Field Length: " & hdr.FieldLength.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "Is Input Field: " & hdr.IsInputField.ToString)
 
                                                         'It's OK to start a field at (1,0) as a special case per documentation.
                                                         'It's OK to start a field on the last column because the first byte is the leading attribute, so the field will start on the next line.
@@ -808,8 +745,6 @@
 
                                                     Case EmulatorScreen.WTD_Order.Write_To_Display_Structured_Field
                                                         Dim sf As New EmulatorScreen.StructuredField(buf, start, Me.Screen)
-                                                        Logger.Trace(vbTab & vbTab & "Length: " & sf.Length.ToString)
-                                                        Logger.Trace(vbTab & vbTab & "Command: " & sf.Command.ToString)
                                                         Select Case sf.Command
                                                             Case EmulatorScreen.StructuredField.WSFCommand.Define_Selection_Field
                                                                 'XXX we don't currently support selection fields
@@ -818,11 +753,6 @@
                                                             Case EmulatorScreen.StructuredField.WSFCommand.Create_Window
                                                                 If sf.Length > 8 Then
                                                                     Dim cwh As New EmulatorScreen.StructuredField.CreateWindowHeader(buf, start + (sf.Length - sf.Data.Length), sf.Data.Length, sf)
-                                                                    Logger.Trace(vbTab & vbTab & vbTab & "Rows: " & cwh.Rows.ToString)
-                                                                    Logger.Trace(vbTab & vbTab & vbTab & "Columns: " & cwh.Columns.ToString)
-                                                                    Logger.Trace(vbTab & vbTab & vbTab & "IsPullDownMenuBar: " & cwh.IsPullDownMenuBar.ToString)
-                                                                    Logger.Trace(vbTab & vbTab & vbTab & "CursorRestrictedToWindow: " & cwh.CursorRestrictedToWindow.ToString)
-                                                                    Logger.Trace(vbTab & vbTab & vbTab & "Minor Structures: " & cwh.MinorStructures.Length.ToString)
 
                                                                     Dim RemainingRows As Integer = Me.Screen.Rows - Me.Screen.Row
                                                                     Dim RemainingCols As Integer = Me.Screen.Columns - Me.Screen.Column
@@ -835,38 +765,16 @@
                                                                     For i As Integer = 0 To cwh.MinorStructures.Length - 1
                                                                         Select Case cwh.MinorStructures(i).GetType
                                                                             Case GetType(Emulator.EmulatorScreen.StructuredField.CreateWindowHeader.WindowTitle_Or_Footer)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & "Window Title or Footer:")
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Length: " & cwh.MinorStructures(i).Length.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Orientation: " & cwh.MinorStructures(i).Orientation.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Element: " & cwh.MinorStructures(i).Element.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Monochrome Attribute: " & cwh.MinorStructures(i).MonochromeAttribute.Attribute.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Color Attribute: " & cwh.MinorStructures(i).ColorAttribute.Attribute.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Text: " & cwh.MinorStructures(i).Text.ToString)
                                                                                 If (cwh.MinorStructures(i).Length < 7) Then
                                                                                     RaiseEvent DataStreamError(NegativeResponse.Structured_Field_Minor_Structure_Length_Not_Valid)
                                                                                     Return False
                                                                                 End If
                                                                             Case GetType(Emulator.EmulatorScreen.StructuredField.CreateWindowHeader.BorderPresentation)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & "Border Presentation:")
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Length: " & cwh.MinorStructures(i).Length.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "UseBorderPresentationCharacters: " & cwh.MinorStructures(i).UseBorderPresentationCharacters.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Element: " & cwh.MinorStructures(i).Element.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Monochrome Attribute: " & cwh.MinorStructures(i).MonochromeAttribute.Attribute.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "Color Attribute: " & cwh.MinorStructures(i).ColorAttribute.Attribute.ToString)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "TopLeftChar: " & cwh.MinorStructures(i).TopLeftChar)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "TopChar: " & cwh.MinorStructures(i).TopChar)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "TopRightChar: " & cwh.MinorStructures(i).TopRightChar)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "LeftChar: " & cwh.MinorStructures(i).LeftChar)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "RightChar: " & cwh.MinorStructures(i).RightChar)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "BottomLeftChar: " & cwh.MinorStructures(i).BottomLeftChar)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "BottomChar: " & cwh.MinorStructures(i).BottomChar)
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & vbTab & "BottomRightChar: " & cwh.MinorStructures(i).BottomRightChar)
                                                                                 If (cwh.MinorStructures(i).Length < 4) Or (cwh.MinorStructures(i).Length > 13) Then
                                                                                     RaiseEvent DataStreamError(NegativeResponse.Structured_Field_Minor_Structure_Length_Not_Valid)
                                                                                     Return False
                                                                                 End If
                                                                             Case Else
-                                                                                Logger.Trace(vbTab & vbTab & vbTab & "Unknown Minor Structure type!")
                                                                                 RaiseEvent DataStreamError(NegativeResponse.Structured_Field_Minor_Structure_Parameter_Not_Valid)
                                                                                 Return False
                                                                         End Select
@@ -939,9 +847,7 @@
                                                         RaiseEvent DataStreamError(NegativeResponse.Command_Not_Valid)
                                                         Return False
                                                 End Select
-                                                Logger.Trace(vbTab & "----------")
                                             Else
-                                                Logger.Trace(vbTab & "ERROR: Unknown WTD Order: &H" & Hex(b))
                                                 RaiseEvent DataStreamError(NegativeResponse.Command_Not_Valid)
                                                 Return False
                                             End If
@@ -949,7 +855,6 @@
                                         End If
 
                                         'If (Not ThisByteWasText) And (text IsNot Nothing) Then
-                                        '    Logger.Trace(vbTab & "Text: '" & text & "'")
                                         '    text = Nothing
                                         'End If
 
@@ -1015,21 +920,6 @@
                                 Me.Invited = True 'RFC1205 says "A work station is said to be 'invited' when the server has sent a read command to the client."
                                 Dim cc As New EmulatorScreen.ControlCharacter(buf(start), buf(start + 1))
                                 start += 2
-                                Logger.Trace(vbTab & "---Pre flags---")
-                                Logger.Trace(vbTab & "Non-Stream Data: " & cc.Flags.Pre.Non_Stream_Data.ToString)
-                                Logger.Trace(vbTab & "Null all non-bypass fields: " & cc.Flags.Pre.Null_All_Non_Bypass_Fields.ToString)
-                                Logger.Trace(vbTab & "Null all non-bypass fields with MDT on: " & cc.Flags.Pre.Null_All_Non_Bypass_Fields_With_MDT_On.ToString)
-                                Logger.Trace(vbTab & "Reset MDT flags in all fields: " & cc.Flags.Pre.Reset_MDT_Flags_In_All_Fields.ToString)
-                                Logger.Trace(vbTab & "Reset MDT flags in non-bypass fields: " & cc.Flags.Pre.Reset_MDT_Flags_In_Non_Bypass_Fields.ToString)
-                                Logger.Trace(vbTab & "Reset pending AID and lock keyboard: " & cc.Flags.Pre.Reset_Pending_AID_And_Lock_Keyboard.ToString)
-                                Logger.Trace(vbTab & "---Post flags---")
-                                Logger.Trace(vbTab & "Cursor moves when keyboard unlocks: " & cc.Flags.Post.Cursor_Moves_When_Keyboard_Unlocks.ToString)
-                                Logger.Trace(vbTab & "Reset blinking cursor: " & cc.Flags.Post.Reset_Blinking_Cursor.ToString)
-                                Logger.Trace(vbTab & "Set blinking cursor: " & cc.Flags.Post.Set_Blinking_Cursor.ToString)
-                                Logger.Trace(vbTab & "Set message waiting indicator off: " & cc.Flags.Post.Set_Message_Waiting_Indicator_Off.ToString)
-                                Logger.Trace(vbTab & "Set message waiting indicator on: " & cc.Flags.Post.Set_Message_Waiting_Indicator_On.ToString)
-                                Logger.Trace(vbTab & "Sound alarm: " & cc.Flags.Post.Sound_Alarm.ToString)
-                                Logger.Trace(vbTab & "Reset pending AID and unlock keyboard: " & cc.Flags.Post.Unlock_Keyboard_And_Reset_Pending_AID.ToString)
 
                                 '﻿The format of the control character following the READ MDT FIELDS command is identical to that in the WTD command. The 5494 completes 	 
                                 'the actions indicated by this character after servicing the READ MDT FIELDS command. 	 
@@ -1067,8 +957,6 @@
                                     Dim sf As New EmulatorScreen.StructuredField(buf, start, Me.Screen)
                                     start += sf.Length
 
-                                    Logger.Trace(vbTab & "Length: " & sf.Length.ToString)
-                                    Logger.Trace(vbTab & "Command: " & sf.Command.ToString)
 
                                     Select Case sf.Command
                                         Case EmulatorScreen.StructuredField.WSFCommand.Query
@@ -1099,7 +987,6 @@
                                             End If
                                         Case Else
                                             'XXX
-                                            Logger.Trace(vbTab & "***UNIMPLEMENTED***")
                                             RaiseEvent DataStreamError(NegativeResponse.Structured_Field_Type_Not_Valid)
                                             Return False
                                     End Select
@@ -1108,7 +995,6 @@
                             Case Command.WRITE_ERROR_CODE, Command.WRITE_ERROR_CODE_TO_WINDOW
                                 'XXX there's a lot more to think about here
                                 'XXX WRITE_ERROR_CODE_TO_WINDOW should behave differently, but this is how Client Access does it and it's easy.
-                                Logger.Trace(vbTab & "----------")
                                 Select Case Cmd
                                     Case Command.WRITE_ERROR_CODE
                                         If buf(start) = EmulatorScreen.WTD_Order.Insert_Cursor Then
@@ -1116,13 +1002,10 @@
                                             Screen.Column = buf(start + 2)
                                             start += 2
                                         End If
-                                        Logger.Trace(vbTab & "Insert Cursor: " & Screen.Row & "," & Screen.Column)
                                     Case Command.WRITE_ERROR_CODE_TO_WINDOW
                                         Dim StartColumn As Byte = buf(start)
                                         Dim EndColumn As Byte = buf(start + 1)
                                         start += 2
-                                        Logger.Trace(vbTab & "Start Column: " & StartColumn.ToString)
-                                        Logger.Trace(vbTab & "End Column: " & EndColumn.ToString)
                                         'There are two negative responses associated with this command:
                                         '   NegativeResponse.Write_Error_Code_To_Window_Not_Valid_With_Current_Error_Line
                                         '   NegativeResponse.Write_Error_Code_To_Window_Row_Col_Address_Not_Valid
@@ -1137,7 +1020,6 @@
                                         Exit For
                                     ElseIf IsAttribute(buf(i)) Then
                                         Dim a As New EmulatorScreen.FieldAttribute(buf(i), Me.Screen.DefaultForeColor, Screen.BackColor)
-                                        Logger.Trace(vbTab & "Attribute: " & a.Attribute.ToString)
                                         start += 1
                                         If i > error_text_start Then
                                             Got_Trailing_Attribute = True
@@ -1156,8 +1038,6 @@
                                 Screen.ErrorText = ErrorText
                                 RaiseEvent ErrorTextChanged()
 
-                                Logger.Trace(vbTab & "Error: " & ErrorText)
-                                Logger.Trace(vbTab & "----------")
 
                             Case Command.READ_SCREEN
                                 If (Me.Keyboard.State = EmulatorKeyboard.Keyboard_State.SS_Message) Or
@@ -1194,15 +1074,10 @@
                                         Reply.WriteByte(Command.RESTORE_PARTIAL_SCREEN)
                                         'XXX SAVE_PARTIAL_SCREEN should save the screen data and queue it to be sent to the AS400 after processing the rest of the data stream.
                                         Dim Flag As Byte = buf(start)
-                                        Logger.Trace(vbTab & "Flag: " & Flag.ToString)
                                         Dim TopRow As Byte = buf(start + 1)
-                                        Logger.Trace(vbTab & "TopRow: " & TopRow.ToString)
                                         Dim LeftColumn As Byte = buf(start + 2)
-                                        Logger.Trace(vbTab & "LeftColumn: " & LeftColumn.ToString)
                                         Dim WindowDepth As Byte = buf(start + 3)
-                                        Logger.Trace(vbTab & "WindowDepth: " & WindowDepth.ToString)
                                         Dim WindowWidth As Byte = buf(start + 4)
-                                        Logger.Trace(vbTab & "WindowWidth: " & WindowWidth.ToString)
                                         start += 5
                                 End Select
 
@@ -1287,7 +1162,6 @@
                                     Return False
                                 End If
                             Case Command.UNDOCUMENTED_1
-                                Logger.Trace(vbTab & "***Undocumented command ignored***")
                                 'XXX All known occurrences of this command have contained no additional bytes, but since it's undocumented, read until the next ESC.  
                                 Do While (start <= MaxOffs) AndAlso (buf(start) <> Emulator.ESC)
                                     start += 1
@@ -1326,7 +1200,6 @@
                 RaiseEvent DataStreamError(NegativeResponse.Premature_Data_Stream_Termination)
                 Return False
             Catch ex As Exception
-                Logger.Error(ex.Message, ex)
                 MsgBox(ex.Message, MsgBoxStyle.Critical, "Error reading Telnet data")
                 Return False
             Finally

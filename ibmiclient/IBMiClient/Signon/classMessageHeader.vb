@@ -28,10 +28,7 @@ Partial Public Class Client
             Public RequestReplyID As MessageType
             Public Shared HeaderLength As Integer = 20
 
-            Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
             Public Sub New(HeaderBytes() As Byte)
-                Logger.Trace("")
                 If HeaderBytes.Length <> HeaderLength Then Throw New ArgumentException("Incorrect number of bytes to interpret as a message header")
                 Dim Data As New System.IO.MemoryStream(HeaderBytes)
                 Me.MessageLength = ReadUInt32(Data)
@@ -48,7 +45,6 @@ Partial Public Class Client
             End Sub
 
             Friend Sub New(MsgType As MessageType)
-                Logger.Trace("")
                 Me.MessageLength = 0
                 Me.HeaderID = 0
                 Me.ServerID = &HE009 'XXX what does this mean?
@@ -72,7 +68,6 @@ Partial Public Class Client
             End Sub
 
             Public Function ToBytes() As Byte()
-                Logger.Trace("")
                 Dim Data As New System.IO.MemoryStream
                 Dim b() As Byte = ToBigEndianBytes(Me.MessageLength)
                 Data.Write(b, 0, b.Length)

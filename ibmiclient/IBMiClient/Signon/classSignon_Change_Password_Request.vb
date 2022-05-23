@@ -33,10 +33,7 @@ Public Class Client
             Private ServerSeed() As Byte
             Private ClientSeed() As Byte
 
-            Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
             Public Sub New(ByVal MsgHeader As MessageHeader, ClientSeed() As Byte, ServerSeed() As Byte, UserName As String, Password As String, NewPassword As String, PasswordLevel As Byte, ServerLevel As UInt16)
-                Logger.Trace("")
                 If MsgHeader.RequestReplyID <> MessageType.ChangePasswordRequest Then Throw New ArgumentException("The supplied header is not the correct message type")
                 Me.Header = MsgHeader
                 Me.UserID = UserName.ToUpper
@@ -68,7 +65,6 @@ Public Class Client
             End Sub
 
             Public Function ToBytes() As Byte()
-                Logger.Trace("")
                 Dim Data As New System.IO.MemoryStream
                 Dim b() As Byte = Me.Header.ToBytes()
                 Data.Write(b, 0, b.Length)

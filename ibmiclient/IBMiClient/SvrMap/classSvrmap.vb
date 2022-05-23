@@ -24,10 +24,7 @@ Partial Public Class Client
         Private ConnectException As Exception
         Private ConnectDone As New System.Threading.ManualResetEvent(False)
 
-        Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
         Public Sub New(Host As String)
-            Logger.Trace("Host='" & Host & "'")
             If String.IsNullOrWhiteSpace(Host) Then Throw New ArgumentException("Host cannot be null")
             Host_ = Host
         End Sub
@@ -37,7 +34,6 @@ Partial Public Class Client
             Return Connect(Host_, TimeoutMS)
         End Function
         Private Function Connect(Host As String, TimeoutMS As Integer) As Boolean
-            Logger.Trace("Host='" & Host & "'")
             If String.IsNullOrWhiteSpace(Host) Then Throw New ArgumentException("Host cannot be null")
             Try
                 ConnectException = Nothing
@@ -48,24 +44,20 @@ Partial Public Class Client
                 If Success Then
                     ConnectDone.WaitOne() 'Wait for ConnectCallback to complete.
                     If ConnectException IsNot Nothing Then Throw ConnectException
-                    Logger.Debug("Success")
                     Return True
                 Else
                     Throw New Exception("Failed to connect to host '" & Host & "' on port " & as_svrmap_port.ToString)
                 End If
             Catch ex As Exception
-                Logger.Error(ex)
             End Try
             Return False
         End Function
 
         Private Sub ConnectCallback(ByVal ar As IAsyncResult)
-            Logger.Trace("")
             Try
                 tc.EndConnect(ar) 'Complete the connection.
                 ConnectDone.Set() 'Signal that the connection attempt has completed.
             Catch ex As Exception
-                Logger.Error(ex)
                 ConnectException = ex
                 ConnectDone.Set() 'Signal that the connection attempt has completed. Don't move this to a Finally block or Disconnect() will hang waiting for the signal.
                 Disconnect()
@@ -73,11 +65,9 @@ Partial Public Class Client
         End Sub
 
         Private Sub Disconnect()
-            Logger.Trace("")
             Try
                 If tc IsNot Nothing Then tc.Close()
             Catch ex As Exception
-                Logger.Error(ex)
             End Try
         End Sub
 
@@ -86,12 +76,10 @@ Partial Public Class Client
         End Function
 
         Private Function ConnectAndGetServicePort(Host As String, ServiceName As String, TimeoutMS As Integer) As Integer
-            Logger.Trace("Host='" & Host & "', ServiceName='" & ServiceName & "', TimeoutMS=" & TimeoutMS.ToString)
             Try
                 Disconnect()
                 If Connect(Host, TimeoutMS) Then Return GetServicePortX(ServiceName, TimeoutMS)
             Catch ex As Exception
-                Logger.Error(ex)
             Finally
                 Disconnect()
             End Try
@@ -99,7 +87,6 @@ Partial Public Class Client
         End Function
 
         Private Function GetServicePortX(ServiceName As String, TimeoutMS As Integer) As Integer
-            Logger.Trace("ServiceName='" & ServiceName & "', TimeoutMS=" & TimeoutMS.ToString)
             If String.IsNullOrWhiteSpace(ServiceName) Then Throw New ArgumentException("ServiceName cannot be null")
             Try
                 Dim s As System.Net.Sockets.NetworkStream = tc.GetStream
@@ -120,11 +107,9 @@ Partial Public Class Client
                     Dim ms As New System.IO.MemoryStream(b)
                     Dim UnknownByte As Byte = ms.ReadByte() 'result code?  =43.
                     Dim ServerPort As UInt32 = ReadUInt32(ms)
-                    Logger.Debug("Success: ServicePort=" & ServerPort.ToString)
                     Return ServerPort
                 End If
             Catch ex As Exception
-                Logger.Error(ex)
             End Try
             Return 0
         End Function

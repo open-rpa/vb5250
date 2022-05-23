@@ -32,17 +32,13 @@ Partial Public Class Client
             Public ServerVersion_Release As Integer
             Public ServerVersion_Modification As Integer
 
-            Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
             Public Sub New(ByVal MsgHeader As MessageHeader, ByVal DataBytes() As Byte)
-                Logger.Trace("")
                 If MsgHeader.RequestReplyID <> MessageType.ExchangeAttributeReply Then Throw New ArgumentException("The supplied header is not the correct message type")
                 Me.Header = MsgHeader
                 If DataBytes.Length < 4 Then Throw New ArgumentException("The supplied data buffer is too short to contain a result code")
                 Dim Data As New System.IO.MemoryStream(DataBytes)
                 Me.ResultCode = ReadUInt32(Data)
                 If Me.ResultCode <> 0 Then
-                    Logger.Debug("!!! Non-zero result code: " & Me.ResultCode.ToString) 'XXX
                 End If
                 Do While Data.Position < Data.Length - 5 'make sure we can get at least the length
                     Dim RecLen As Integer = ReadUInt32(Data)
@@ -71,7 +67,6 @@ Partial Public Class Client
                             Me.JobName = System.Text.Encoding.UTF8.GetString(b)
                             Me.JobName = Me.JobName.Replace(Chr(0), " ").Trim
                         Case Else
-                            Logger.Debug("Unexpected codepoint: " & CodePoint.ToString)
                             'Read the rest of the record and throw it away
                             Dim b(RecLen - 6 - 1) As Byte
                             Data.Read(b, 0, b.Length)

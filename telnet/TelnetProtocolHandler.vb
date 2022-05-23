@@ -32,8 +32,6 @@ Namespace De.Mud.Telnet
     ''' </summary>
     Public MustInherit Class TelnetProtocolHandler
 
-        Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
 #Region "Globals and properties"
 
         ''' <summary>
@@ -441,10 +439,6 @@ Namespace De.Mud.Telnet
                                                         Else
                                                             USERVARs.Add("IBMSUBSPW", SubsPW)
                                                         End If
-                                                        'Logger.Debug("ServerSeed=" & IBM_ServerSeed)
-                                                        'Logger.Debug("ClientSeed=" & ClientSeed)
-                                                        'Logger.Debug("UserName=" & UserName)
-                                                        'Logger.Debug("SubsPW=" & SubsPW)
 
                                                     End If
                                                 End If
@@ -496,11 +490,9 @@ Namespace De.Mud.Telnet
                     Case IAC
                         s.WriteByte(IAC)
                         s.WriteByte(IAC)
-                        Logger.Debug("Escaped IAC")
                     Case TELQUAL_VAR, TELQUAL_USERVAR, TELQUAL_VALUE, TELQUAL_ESC
                         s.WriteByte(TELQUAL_ESC)
                         s.WriteByte(b)
-                        Logger.Debug("Escaped " & b.ToString)
                     Case Else
                         s.WriteByte(b)
                 End Select
@@ -509,7 +501,6 @@ Namespace De.Mud.Telnet
             s.Close()
         End Function
         Private Function NE_GetEnvironmentValueBytes(ByVal VarType As Byte, ByVal VarName As String, ByVal VarValue As String) As System.IO.MemoryStream
-            Logger.Debug("VarType=" & VarType.ToString & ", VarName=" & VarName & ", VarValue=" & VarValue)
             Dim ReplyStream As New System.IO.MemoryStream
             ReplyStream.WriteByte(VarType)
             Dim b() As Byte = StringToBytes(VarName)

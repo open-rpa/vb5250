@@ -43,8 +43,6 @@ Namespace De.Mud.Telnet
         Inherits TelnetProtocolHandler
 
 #Region "Globals and properties"
-        Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
         ' ManualResetEvent instances signal completion.
         Private connectDone As New ManualResetEvent(False)
         Private CertActionDone As New ManualResetEvent(False)
@@ -103,7 +101,6 @@ Namespace De.Mud.Telnet
                             Dim SSLStream As System.Net.Security.SslStream = DirectCast(stream, SslStream)
                             Return New X509Certificate2(SSLStream.RemoteCertificate)
                         Catch ex As Exception
-                            Logger.Error(ex)
                         End Try
                     End If
                 End If
@@ -124,7 +121,6 @@ Namespace De.Mud.Telnet
                                 & vbCr & "Cipher: " & SSLStream.CipherAlgorithm.ToString & "(" & SSLStream.CipherStrength.ToString & ")" _
                                 & vbCr & "KeyExchange: " & SSLStream.KeyExchangeAlgorithm.ToString & "(" & SSLStream.KeyExchangeStrength.ToString & ")"
                         Catch ex As Exception
-                            Logger.Error(ex)
                         End Try
                     End If
                 End If
@@ -220,7 +216,6 @@ Namespace De.Mud.Telnet
         ''' <param name="port">The Telnet port on the remote host.</param>
         ''' <param name="UseSSL">Encrypt the connection with SSL?</param>
         Public Sub Connect(ByVal host As String, ByVal port As Integer, UseSSL As Boolean)
-            Logger.Trace("")
             m_hostname = host
             m_port = port
             m_UseSSL = UseSSL
@@ -244,24 +239,20 @@ Namespace De.Mud.Telnet
                 ' Connect to the remote endpoint.
                 connectDone.Reset()
                 CertActionDone.Reset()
-                Logger.Debug("Calling BeginConnect...")
                 Dim Result As System.IAsyncResult = tcp_client.BeginConnect(ipAddress, port, New AsyncCallback(AddressOf ConnectCallback), tcp_client)
                 Dim Success As Boolean = Result.AsyncWaitHandle.WaitOne(15000) 'XXX 15 second timeout for BeginConnect.
-                Logger.Debug("BeginConnect finished")
                 'At this point we have not completed the connection, but it has either been accepted by the remote host or has timed out.
-                 If Success Then
+                If Success Then
                     If UseSSL Then CertActionDone.WaitOne() 'Wait for SSL negotiation to complete.  We may be waiting for the user to accept the remote certificate, so don't time out.
                     connectDone.WaitOne() 'Wait for ConnectCallback to complete.  This is set in the Finally block of ConnectCallback.
                 Else
                     Throw New Exception("Timeout connecting to host") 'Timed out during BeginConnect
                 End If
             Catch ex As Exception
-                Logger.Error(ex.Message, ex)
                 Disconnect()
                 Throw
             Finally
                 Reset()
-                Logger.Debug("Firing ConnectionAttemptCompleted event")
                 RaiseEvent ConnectionAttemptCompleted(Me, New EventArgs)
             End Try
         End Sub
@@ -272,23 +263,19 @@ Namespace De.Mud.Telnet
         ''' <param name="cmd">the command</param>
         ''' <returns>output of the command</returns>
         Public Function Send(ByVal cmd As String) As String
-            Logger.Trace("")
             Try
                 Dim arr As Byte() = Encoding.ASCII.GetBytes(cmd)
                 Transpose(arr)
                 Return Nothing
             Catch ex As Exception
-                Logger.Error(ex.Message, ex)
                 Disconnect()
                 Throw (New ApplicationException("Error writing to socket.", ex))
             End Try
         End Function
         Public Sub Send(ByVal bytes() As Byte)
-            Logger.Trace("")
             Try
                 Transpose(bytes)
             Catch ex As Exception
-                Logger.Error(ex.Message, ex)
                 Disconnect()
                 Throw (New ApplicationException("Error writing to socket.", ex))
             End Try
@@ -309,22 +296,18 @@ Namespace De.Mud.Telnet
         End Sub
 
         Public Sub Disconnect(ByVal Reason As String)
-            Logger.Trace("")
             Static Disconnecting As Boolean
             If Not Disconnecting Then
-                Logger.Debug("Disconnecting ==> True")
                 Disconnecting = True
                 'Try
                 '    tcp_client.Client.Shutdown(SocketShutdown.Both)
                 'Catch ex As Exception
-                '    Logger.Error(ex.Message, ex)
                 'End Try
                 Try
                     tcp_client.Close()
                 Catch ex As ObjectDisposedException
                     'Do nothing; this happens after we've already disconnected.
                 Catch ex As Exception
-                    Logger.Error(ex.Message, ex)
                 End Try
 
                 'Setting stream to Nothing here enables our "Secured" property to return False on a closed tcpclient.
@@ -333,12 +316,9 @@ Namespace De.Mud.Telnet
                 Try
                     RaiseEvent Disconnected(Me, New DisconnectEventArgs(Reason))
                 Catch ex As Exception
-                    Logger.Error(ex.Message, ex)
                 End Try
-                Logger.Debug("Disconnecting ==> False")
                 Disconnecting = False
             Else
-                Logger.Debug("Aborting because Disconnecting = True")
             End If
         End Sub
 #End Region
@@ -350,7 +330,6 @@ Namespace De.Mud.Telnet
         ''' </summary>
         ''' <param name="b">the buffer to be written</param>
         Protected Overrides Sub Write(ByVal b As Byte())
-            Logger.Trace("")
             Send(tcp_client, b)
             sendDone.WaitOne()
         End Sub
@@ -361,7 +340,6 @@ Namespace De.Mud.Telnet
         ''' <param name="ar">Stores state information for this asynchronous 
         ''' operation as well as any user-defined data.</param>
         Private Sub ConnectCallback(ByVal ar As IAsyncResult)
-            Logger.Trace("")
             Try
                 ' Retrieve the socket from the state object.
                 'tcp_client = DirectCast(ar.AsyncState, TcpClient)
@@ -378,7 +356,6 @@ Namespace De.Mud.Telnet
                 End If
                 connectDone.Set() 'Signal that the connection attempt has completed.
             Catch ex As Exception
-                Logger.Error(ex.Message, ex)
                 CertActionDone.Set() 'Signal that SSL authentication has completed so we don't wait forever.
                 connectDone.Set() 'Signal that the connection attempt has completed. Don't move this to a Finally block or Disconnect() will hang waiting for the signal.
                 Disconnect()
@@ -386,9 +363,8 @@ Namespace De.Mud.Telnet
         End Sub
 
         Private Function ServerCertificateValidationCallback(ByVal sender As Object, ByVal certificate As X509Certificate, ByVal chain As X509Chain, ByVal sslPolicyErrors As SslPolicyErrors) As Boolean
-            Logger.Trace("")
             Try
-                If sslPolicyErrors = sslPolicyErrors.None Then
+                If sslPolicyErrors = SslPolicyErrors.None Then
                     Return True
                 Else
                     Dim Store As New X509Store(StoreName.TrustedPeople, StoreLocation.CurrentUser)
@@ -401,9 +377,9 @@ Namespace De.Mud.Telnet
 
                     'We didn't find the cert in the store, so prompt the user.
                     Dim Reasons As New List(Of String)
-                    If sslPolicyErrors And sslPolicyErrors.RemoteCertificateNotAvailable Then Reasons.Add("Remote certificate not available")
-                    If sslPolicyErrors And sslPolicyErrors.RemoteCertificateNameMismatch Then Reasons.Add("Remote certificate name mismatch")
-                    If sslPolicyErrors And sslPolicyErrors.RemoteCertificateChainErrors Then Reasons.Add("Remote certificate chain errors")
+                    If sslPolicyErrors And SslPolicyErrors.RemoteCertificateNotAvailable Then Reasons.Add("Remote certificate not available")
+                    If sslPolicyErrors And SslPolicyErrors.RemoteCertificateNameMismatch Then Reasons.Add("Remote certificate name mismatch")
+                    If sslPolicyErrors And SslPolicyErrors.RemoteCertificateChainErrors Then Reasons.Add("Remote certificate chain errors")
                     Dim tmpDate As Date
                     If Date.TryParse(certificate.GetEffectiveDateString, tmpDate) Then
                         If tmpDate > Now Then Reasons.Add("Remote certificate is not yet valid")
@@ -451,7 +427,6 @@ Namespace De.Mud.Telnet
                     End If
                 End If
             Catch ex As Exception
-                Logger.Error(ex.Message, ex)
                 Return False
             Finally
                 CertActionDone.Set()
@@ -463,9 +438,6 @@ Namespace De.Mud.Telnet
         ''' </summary>
         ''' <param name="client">The socket to get data from.</param>
         Private Sub Receive(ByVal client As TcpClient)
-            Logger.Trace("")
-            If client Is Nothing Then Logger.Debug("client is Nothing!")
-            If stream Is Nothing Then Logger.Debug("stream is Nothing!")
             If client IsNot Nothing Then
                 If stream IsNot Nothing Then
                     Try
@@ -476,7 +448,6 @@ Namespace De.Mud.Telnet
                         ' Begin receiving the data from the remote device.
                         stream.BeginRead(state__1.Buffer, 0, State.BufferSize, New AsyncCallback(AddressOf ReceiveCallback), state__1)
                     Catch ex As Exception
-                        Logger.Error(ex.Message, ex)
                         Disconnect()
                         Throw (New ApplicationException("Error on read from socket.", ex))
                     End Try
@@ -490,7 +461,6 @@ Namespace De.Mud.Telnet
         ''' <param name="ar">Stores state information for this asynchronous 
         ''' operation as well as any user-defined data.</param>
         Private Sub ReceiveCallback(ByVal ar As IAsyncResult)
-            Logger.Trace("")
             Try
                 ' Retrieve the state object and the client socket 
                 ' from the async state object.
@@ -525,7 +495,6 @@ Namespace De.Mud.Telnet
                 If ex.InnerException IsNot Nothing AndAlso ex.InnerException.GetType Is GetType(ObjectDisposedException) Then
                     'Do nothing; this happens after we've already disconnected.
                 Else
-                    Logger.Error(ex.Message, ex)
                     Disconnect("Error reading from socket or processing received data: " & ex.Message)
                 End If
             End Try
@@ -537,7 +506,6 @@ Namespace De.Mud.Telnet
         ''' <param name="client">The socket to write to.</param>
         ''' <param name="byteData">The data to write.</param>
         Private Sub Send(ByVal client As TcpClient, ByVal byteData As Byte())
-            Logger.Trace("")
             ' Begin sending the data to the remote device.
             sendDone.Reset()
             stream.BeginWrite(byteData, 0, byteData.Length, New AsyncCallback(AddressOf SendCallback), client)
@@ -549,7 +517,6 @@ Namespace De.Mud.Telnet
         ''' <param name="ar">Stores state information for this asynchronous 
         ''' operation as well as any user-defined data.</param>
         Private Sub SendCallback(ByVal ar As IAsyncResult)
-            Logger.Trace("")
             ' Retrieve the socket from the state object.
             'Dim client As TcpClient = DirectCast(ar.AsyncState, TcpClient)
 
@@ -557,7 +524,6 @@ Namespace De.Mud.Telnet
             Try
                 stream.EndWrite(ar)
             Catch ex As Exception
-                Logger.Error(ex.Message, ex)
             End Try
 
             ' Signal that all bytes have been sent.
@@ -568,7 +534,6 @@ Namespace De.Mud.Telnet
 
         Private Function TCPClient_Connected(Client As TcpClient) As Boolean
             Try
-                Logger.Trace("Started")
                 If Client Is Nothing Then Return False
 
                 'Return Client.Connected 'this is unreliable
@@ -580,10 +545,8 @@ Namespace De.Mud.Telnet
                     Return False
                 End If
             Catch ex As Exception
-                'Logger.Error(ex.Message, ex)
                 Return False
             Finally
-                Logger.Trace("Finished")
             End Try
         End Function
 
@@ -601,25 +564,21 @@ Namespace De.Mud.Telnet
 #Region "Cleanup"
 
         Public Sub Close()
-            Logger.Trace("")
             Dispose()
         End Sub
 
         Public Sub Dispose()
-            Logger.Trace("")
             GC.SuppressFinalize(Me)
             Dispose(True)
         End Sub
 
         Protected Sub Dispose(ByVal disposing As Boolean)
-            Logger.Trace("")
             If disposing Then
                 Disconnect()
             End If
         End Sub
 
         Protected Overrides Sub Finalize()
-            Logger.Trace("")
             Try
                 Dispose(False)
             Finally

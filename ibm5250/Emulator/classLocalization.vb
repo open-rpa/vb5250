@@ -1,6 +1,5 @@
 ﻿Partial Class Emulator
     Public Class Localization
-        Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
         Public Locales As SortedList(Of String, Locale)
         Public Sub New()
             Locales = New SortedList(Of String, Locale)
@@ -25,10 +24,7 @@
                                     Try
                                         Locales.Add(loc(0), New Locale(loc(0), System.Text.Encoding.GetEncoding(loc(1)), loc(2), loc(3), loc(4)))
                                     Catch ex As Exception
-                                        Logger.Warn("Error adding locale definition from '" & fname & "' line " & LineNumber & ": " & ex.Message)
                                     End Try
-                                Else
-                                    Logger.Warn("Invalid Locale definition in '" & fname & "' line " & LineNumber & ": incorrect number of fields")
                                 End If
                             End If
                         End If
@@ -36,7 +32,6 @@
                     Loop
                 End If
             Catch ex As Exception
-                Logger.Warn(ex.Message)
             Finally
                 If sr IsNot Nothing Then sr.Close()
             End Try

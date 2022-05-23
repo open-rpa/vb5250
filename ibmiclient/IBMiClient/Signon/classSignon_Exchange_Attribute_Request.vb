@@ -24,8 +24,6 @@ Partial Public Class Client
             Friend ClientLevel As UInt16
             Friend ClientSeed(7) As Byte
 
-            Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
             Public Sub New(ByVal MsgHeader As MessageHeader)
                 Me.New(MsgHeader, Encryption.RandomSeed)
             End Sub
@@ -35,7 +33,6 @@ Partial Public Class Client
             End Sub
 
             Public Sub New(ByVal MsgHeader As MessageHeader, ByVal ClientVersion As UInt32, ByVal ClientLevel As UInt16, ByVal ClientSeed() As Byte)
-                Logger.Trace("")
                 If ClientSeed.Length <> 8 Then Throw New ArgumentException("ClientSeed must be an array of 8 bytes")
                 If MsgHeader.RequestReplyID <> MessageType.ExchangeAttributeRequest Then Throw New ArgumentException("The supplied header is not the correct message type")
                 Me.Header = MsgHeader
@@ -45,7 +42,6 @@ Partial Public Class Client
             End Sub
 
             Public Function ToBytes() As Byte()
-                Logger.Trace("")
                 Dim Data As New System.IO.MemoryStream
                 Dim b() As Byte = Me.Header.ToBytes()
                 Data.Write(b, 0, b.Length)

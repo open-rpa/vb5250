@@ -85,10 +85,7 @@ Partial Public Class Client
         Private Port_ As Integer
         Private ClientSeed_(7) As Byte 'Most recently used client seed
 
-        Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
         Public Sub New(Host As String, Port As Integer, UseSSL As Boolean)
-            Logger.Trace("Host='" & Host & "', Port='" & Port.ToString & "'")
             If String.IsNullOrWhiteSpace(Host) Then Throw New ArgumentException("Host cannot be null")
             If Port < 1 Then Throw New Exception("The Port parameter is not valid")
             Host_ = Host
@@ -140,7 +137,6 @@ Partial Public Class Client
             Return Connect(Host_, Port_, TimeoutMS)
         End Function
         Private Function Connect(Host As String, Port As Integer, TimeoutMS As Integer) As Boolean
-            Logger.Trace("")
             If String.IsNullOrWhiteSpace(Host) Then Throw New ArgumentException("Host cannot be null")
             If Port_ < 1 Then Throw New Exception("The Port parameter is not valid")
             Try
@@ -155,19 +151,16 @@ Partial Public Class Client
                     If UseSSL_ Then CertActionDone.WaitOne() 'Wait for SSL negotiation to complete.  We may be waiting for the user to accept the remote certificate, so don't time out.
                     ConnectDone.WaitOne() 'Wait for ConnectCallback to complete.
                     If ConnectException IsNot Nothing Then Throw ConnectException
-                    Logger.Debug("Success")
                     Return True
                 Else
                     Throw New Exception("Failed to connect to host '" & Host & "' on port " & Port.ToString)
                 End If
             Catch ex As Exception
-                Logger.Error(ex)
                 Try
                     tc.Close()
                 Catch exx As ObjectDisposedException
                     'Do nothing; this happens after we've already disconnected.
                 Catch exx As Exception
-                    Logger.Error(exx)
                 End Try
                 Throw
             End Try
@@ -175,7 +168,6 @@ Partial Public Class Client
         End Function
 
         Private Sub ConnectCallback(ByVal ar As IAsyncResult)
-            Logger.Trace("")
             Try
                 ' Complete the connection.
                 tc.EndConnect(ar)
@@ -189,7 +181,6 @@ Partial Public Class Client
                 End If
                 ConnectDone.Set() 'Signal that the connection attempt has completed.
             Catch ex As Exception
-                Logger.Error(ex)
                 ConnectException = ex
                 CertActionDone.Set() 'Signal that SSL authentication has completed so we don't wait forever.
                 ConnectDone.Set() 'Signal that the connection attempt has completed. Don't move this to a Finally block or Disconnect() will hang waiting for the signal.
@@ -198,9 +189,8 @@ Partial Public Class Client
         End Sub
 
         Private Function ServerCertificateValidationCallback(ByVal sender As Object, ByVal certificate As X509Certificate, ByVal chain As X509Chain, ByVal sslPolicyErrors As SslPolicyErrors) As Boolean
-            Logger.Trace("")
             Try
-                If sslPolicyErrors = sslPolicyErrors.None Then
+                If sslPolicyErrors = SslPolicyErrors.None Then
                     Return True
                 Else
                     Dim Store As New X509Store(StoreName.TrustedPeople, StoreLocation.CurrentUser)
@@ -213,9 +203,9 @@ Partial Public Class Client
 
                     'We didn't find the cert in the store, so prompt the user.
                     Dim Reasons As New List(Of String)
-                    If sslPolicyErrors And sslPolicyErrors.RemoteCertificateNotAvailable Then Reasons.Add("Remote certificate not available")
-                    If sslPolicyErrors And sslPolicyErrors.RemoteCertificateNameMismatch Then Reasons.Add("Remote certificate name mismatch")
-                    If sslPolicyErrors And sslPolicyErrors.RemoteCertificateChainErrors Then Reasons.Add("Remote certificate chain errors")
+                    If sslPolicyErrors And SslPolicyErrors.RemoteCertificateNotAvailable Then Reasons.Add("Remote certificate not available")
+                    If sslPolicyErrors And SslPolicyErrors.RemoteCertificateNameMismatch Then Reasons.Add("Remote certificate name mismatch")
+                    If sslPolicyErrors And SslPolicyErrors.RemoteCertificateChainErrors Then Reasons.Add("Remote certificate chain errors")
                     Dim tmpDate As Date
                     If Date.TryParse(certificate.GetEffectiveDateString, tmpDate) Then
                         If tmpDate > Now Then Reasons.Add("Remote certificate is not yet valid")
@@ -263,7 +253,6 @@ Partial Public Class Client
                     End If
                 End If
             Catch ex As Exception
-                Logger.Error(ex)
                 Return False
             Finally
                 CertActionDone.Set()
@@ -271,7 +260,6 @@ Partial Public Class Client
         End Function
 
         Private Sub SayGoodBye()
-            Logger.Trace("")
             If tc IsNot Nothing Then
                 Dim Bye As New MessageHeader(MessageType.EndServerRequest)
                 Dim b() As Byte = Bye.ToBytes
@@ -280,25 +268,17 @@ Partial Public Class Client
         End Sub
 
         Private Sub Disconnect()
-            Logger.Trace("")
             Try
                 If tc IsNot Nothing Then tc.Close()
             Catch ex As Exception
-                Logger.Error(ex)
             End Try
         End Sub
 
         Public Function Get_Server_Attributes(TimeoutMS As Integer) As ServerInfo
-            Logger.Trace("")
             Connect(TimeoutMS)
             Dim AttributeReply As Signon.Exchange_Attribute_Reply = Get_Server_AttributesX(TimeoutMS)
             SayGoodBye()
             Disconnect()
-            Logger.Debug("Server Version: V" & AttributeReply.ServerVersion_Version.ToString & "R" & AttributeReply.ServerVersion_Release.ToString & "M" & AttributeReply.ServerVersion_Modification.ToString)
-            Logger.Debug("Server Level: " & AttributeReply.ServerLevel)
-            Logger.Debug("Server Seed: " & BitConverter.ToString(AttributeReply.ServerSeed))
-            Logger.Debug("Password Level: " & AttributeReply.PasswordLevel)
-            Logger.Debug("Job Name: " & AttributeReply.JobName.Trim)
             Dim Result As New ServerInfo
             Result.Host = Me.Host_
             Result.Version = AttributeReply.ServerVersion_Version
@@ -312,12 +292,10 @@ Partial Public Class Client
         End Function
 
         Private Function Get_Server_AttributesX(TimeoutMS As Integer) As Signon.Exchange_Attribute_Reply
-            Logger.Trace("")
             Dim MsgHeader As New Signon.MessageHeader(MessageType.ExchangeAttributeRequest)
             Dim AttributeRequest As New Signon.Exchange_Attribute_Request(MsgHeader)
             Array.Copy(AttributeRequest.ClientSeed, ClientSeed_, ClientSeed_.Length)
             Dim b() As Byte = AttributeRequest.ToBytes
-            Logger.Debug("Request: " & BitConverter.ToString(b))
             stream.Write(b, 0, b.Length)
 
             Dim o As Object = GetReply(TimeoutMS)
@@ -338,13 +316,6 @@ Partial Public Class Client
             Dim InfoReply As Signon.Info_Reply = Get_Signon_InfoX(UserName, Password, TimeoutMS)
             SayGoodBye()
             Disconnect()
-            Logger.Debug("ResultCode: " & InfoReply.ResultCode.ToString)
-            Logger.Debug("ResultText: " & InfoReply.ResultText)
-            Logger.Debug("CurrentSignonDate: " & InfoReply.CurrentSignonDate.ToString)
-            Logger.Debug("LastSignonDate: " & InfoReply.LastSignonDate.ToString)
-            Logger.Debug("ExpirationDate: " & InfoReply.ExpirationDate.ToString)
-            Logger.Debug("ExpirationWarning: " & InfoReply.ExpirationWarning.ToString)
-            Logger.Debug("ServerCCSID: " & InfoReply.ServerCCSID.ToString)
             Dim Result As New SignonInfo
             Result.Code = InfoReply.ResultCode
             Result.Text = InfoReply.ResultText
@@ -355,15 +326,6 @@ Partial Public Class Client
             'XXX more props here?
             Result.Messages = New List(Of SignonInfoMessage)
             For Each Msg As Signon.Info_Message In InfoReply.Messages
-                Logger.Debug("  -Message-")
-                Logger.Debug("  Severity: " & Msg.Severity.ToString)
-                Logger.Debug("  ReasonCode: " & Msg.ReasonCode)
-                Logger.Debug("  ReasonText: " & Msg.ReasonText)
-                Logger.Debug("  FileName: " & Msg.FileName)
-                Logger.Debug("  LibraryName: " & Msg.LibraryName)
-                Logger.Debug("  Text: " & Msg.Text)
-                Logger.Debug("  Help: " & Msg.Help)
-                Logger.Debug("")
                 Dim ResultMessage As New SignonInfoMessage
                 ResultMessage.Severity = CInt(Msg.Severity)
                 ResultMessage.ReasonCode = Msg.ReasonCode
@@ -378,13 +340,11 @@ Partial Public Class Client
         End Function
 
         Private Function Get_Signon_InfoX(UserName As String, Password As String, TimeoutMS As Integer) As Signon.Info_Reply
-            Logger.Trace("")
             Dim AttributeReply As Signon.Exchange_Attribute_Reply = Get_Server_AttributesX(TimeoutMS)
 
             Dim MsgHeader As New Signon.MessageHeader(MessageType.InfoRequest)
             Dim InfoReq As New Signon.Info_Request(MsgHeader, ClientSeed_, AttributeReply.ServerSeed, UserName, Password, AttributeReply.PasswordLevel, AttributeReply.ServerLevel)
             Dim b() As Byte = InfoReq.ToBytes
-            Logger.Debug("Request: " & BitConverter.ToString(b))
             stream.Write(b, 0, b.Length)
 
             Dim o As Object = GetReply(TimeoutMS)
@@ -397,28 +357,16 @@ Partial Public Class Client
         End Function
 
         Public Function Change_Password(UserName As String, Password As String, NewPassword As String, TimeoutMS As Integer) As ChangePasswordInfo
-            Logger.Trace("")
             Connect(TimeoutMS)
             Dim ChangePasswordReply As Signon.Change_Password_Reply = Change_PasswordX(UserName, Password, NewPassword, TimeoutMS)
             SayGoodBye()
             Disconnect()
-            Logger.Debug("ResultCode: " & ChangePasswordReply.ResultCode.ToString)
-            Logger.Debug("ResultText: " & ChangePasswordReply.ResultText)
             'XXX more props here?
             Dim Result As New ChangePasswordInfo
             Result.Code = ChangePasswordReply.ResultCode
             Result.Text = ChangePasswordReply.ResultText
             Result.Messages = New List(Of SignonInfoMessage)
             For Each Msg As Signon.Info_Message In ChangePasswordReply.Messages
-                Logger.Debug("  -Message-")
-                Logger.Debug("  Severity: " & Msg.Severity.ToString)
-                Logger.Debug("  ReasonCode: " & Msg.ReasonCode)
-                Logger.Debug("  ReasonText: " & Msg.ReasonText)
-                Logger.Debug("  FileName: " & Msg.FileName)
-                Logger.Debug("  LibraryName: " & Msg.LibraryName)
-                Logger.Debug("  Text: " & Msg.Text)
-                Logger.Debug("  Help: " & Msg.Help)
-                Logger.Debug("")
                 Dim InfoMsg As New SignonInfoMessage
                 InfoMsg.Severity = Msg.Severity
                 InfoMsg.ReasonCode = Msg.ReasonCode
@@ -433,13 +381,11 @@ Partial Public Class Client
         End Function
 
         Private Function Change_PasswordX(UserName As String, Password As String, NewPassword As String, TimeoutMS As Integer) As Signon.Change_Password_Reply
-            Logger.Trace("")
             Dim AttributeReply As Signon.Exchange_Attribute_Reply = Get_Server_AttributesX(TimeoutMS)
 
             Dim MsgHeader As New Signon.MessageHeader(MessageType.ChangePasswordRequest)
             Dim ChangePasswordRequest As New Signon.Change_Password_Request(MsgHeader, ClientSeed_, AttributeReply.ServerSeed, UserName, Password, NewPassword, AttributeReply.PasswordLevel, AttributeReply.ServerLevel)
             Dim b() As Byte = ChangePasswordRequest.ToBytes
-            Logger.Debug("Request: " & BitConverter.ToString(b))
             stream.Write(b, 0, b.Length)
 
             Dim o As Object = GetReply(TimeoutMS)
@@ -452,7 +398,6 @@ Partial Public Class Client
         End Function
 
         Private Function GetReply(TimeoutMS As Integer) As Object
-            Logger.Trace("")
             Try
                 Dim b() As Byte
                 b = ReadTCPBytes(stream, MessageHeader.HeaderLength, TimeoutMS)
@@ -469,13 +414,11 @@ Partial Public Class Client
                         Throw New Exception("Unimplemented Reply type: " & Header.RequestReplyID.ToString)
                 End Select
             Catch ex As Exception
-                Logger.Error(ex)
             End Try
             Return Nothing
         End Function
 
         Private Function ReadTCPBytes(ByRef s As System.IO.Stream, ByVal ExpectedBytes As Integer, ByVal TimeoutMS As Integer) As Byte()
-            Logger.Trace("ExpectedBytes='" & ExpectedBytes.ToString & "'")
             If Not s.CanRead Then Throw New Exception("Supplied stream is not readable")
             Dim start As Date = Now
             Dim BytesRead As Integer = 0
@@ -485,7 +428,6 @@ Partial Public Class Client
                 If BytesRead >= ExpectedBytes Then Exit Do
                 Threading.Thread.CurrentThread.Join(100)
             Loop
-            Logger.Debug("Expected bytes=" & ExpectedBytes.ToString & ", Actual bytes=" & BytesRead.ToString)
             If BytesRead < ExpectedBytes Then Throw New Exception("Insufficient data received from the server")
             Return b
         End Function

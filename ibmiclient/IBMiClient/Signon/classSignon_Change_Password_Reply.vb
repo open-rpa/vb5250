@@ -26,10 +26,7 @@ Partial Public Class Client
             'Derived fields
             Friend ResultText As String
 
-            Private Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger
-
             Public Sub New(ByVal MsgHeader As MessageHeader, ByVal DataBytes() As Byte)
-                Logger.Trace("")
                 If MsgHeader.RequestReplyID <> MessageType.ChangePasswordReply Then Throw New ArgumentException("The supplied header is not the correct message type")
                 Me.Header = MsgHeader
                 If DataBytes.Length < 4 Then Throw New ArgumentException("The supplied data buffer is too short to contain a result code")
@@ -65,7 +62,6 @@ Partial Public Class Client
                             'Case CodePoints.ServerCCSID
                             '    Me.ServerCCSID = ReadUInt32(Data)
                         Case Else
-                            Logger.Debug("Unexpected codepoint: " & CodePoint.ToString)
                             'Read the rest of the record and throw it away
                             Dim b(RecLen - 6 - 1) As Byte
                             Data.Read(b, 0, b.Length)
