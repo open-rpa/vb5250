@@ -1,0 +1,69 @@
+﻿Albanian, IBM500, 500, 697, ALI
+Arabic, IBM420, 420, 235, CLB
+Austrian/German, IBM273, 273, 697, AGB
+Austrian/German (MNCS), IBM500, 500, 697, AGI
+Belgian MNCS, IBM500, 500, 697, BLI
+Brazilian Portuguese, IBM037, 37, 697, BRB
+Bulgarian, cp1025, 1025, 1150, BGB
+#Canadian French, , 260, 341, CAB
+Canadian French MNCS, IBM500, 500, 697, CAI
+Croatian, IBM870, 870, 959, YGI
+Cyrillic, IBM880, 880, 960, CYB
+Czech, IBM870, 870, 959, CSB
+Danish, IBM277, 277, 697, DMB
+Danish MNCS, IBM500, 500, 697, DMI
+Finnish/Swedish, IBM278, 278, 697, FNB
+Finnish/Swedish MNCS, IBM500, 500, 697, FNI
+French (Azerty), IBM297, 297, 697, FAB
+French (Azerty) MNCS, IBM500, 500, 697, FAI
+French (Qwerty), IBM297, 297, 697, FQB
+French (Qwerty) MNCS, IBM500, 500, 697, FQI
+Greek, cp875, 875, 925, GNB
+Hebrew, IBM424, 424, 941, NCB
+Hungarian, IBM870, 870, 959, HNB
+Icelandic, IBM871, 871, 697, ICB
+Icelandic MNCS, IBM500, 500, 697, ICI
+International, IBM500, 500, 697, INB
+International MNCS, IBM500, 500, 697, INB
+#Farsi (Iran), , 1097, 1219, IRB
+Italian, IBM280, 280, 697, ITB
+Italian MNCS, IBM500, 500, 697, ITI
+#Japanese-English, , 281, 697, JEB
+Japanese-English MNCS, IBM500, 500, 697, JEI
+#Japanese Kanji and Katakana, IBM290, 290, 1172, JKB
+Japanese Kanji and US English, IBM037, 37, 697, JUB
+#Japanese Katakana, IBM290, 290, 332, KAB
+#Japanese Latin Extended, , 1027, 1172, JPB
+Korean, x-EBCDIC-KoreanExtended, 833, 1173, KOB
+Latin 2, IBM870, 870, 959, ROB
+Macedonian, cp1025, 1025, 1150, MKB
+Dutch (Netherlands), IBM037, 37, 697, NEB
+Dutch (Netherlands) MNCS, IBM500, 500, 697, NEI
+Norwegian, IBM277, 277, 697, NWB
+Norwegian MNCS, IBM500, 500, 697, NWI
+Polish, IBM870, 870, 959, PLB
+Portuguese, IBM037, 37, 697, PRB
+Portuguese MNCS, IBM500, 500, 697, PRI
+Romanian, IBM870, 870, 959, RMB
+Russian, cp1025, 1025, 1150, RUB
+Serbian (Cyrillic), cp1025, 1025, 1150, SQB
+Serbian (Latin), IBM870, 870, 959, YGI
+#Simplified Chinese, , 836, 1174, RCB
+Slovakian, IBM870, 870, 959, SKB
+Slovenian, IBM870, 870, 959, YGI
+Spanish, IBM284, 284, 697, SPB
+Spanish MNCS, IBM500, 500, 697, SPI
+Spanish Speaking, IBM284, 284, 697, SSB
+Spanish Speaking MNCS, IBM500, 500, 697, SSI
+Swedish, IBM278, 278, 697, SWB
+Swedish MNCS, IBM500, 500, 697, SWI
+French (Switzerland) MNCS, IBM500, 500, 697, SFI
+German (Switzerland) MNCS, IBM500, 500, 697, SGI
+#Thai, , 838, 1176, THB
+Traditional Chinese, IBM037, 37, 1175, TAB
+Turkish (Qwerty), IBM1026, 1026, 1152, TKB
+Turkish (F), IBM1026, 1026, 1152, TRB
+English (United Kingdom), IBM285, 285, 697, UKB
+English (United Kingdom) MNCS, IBM500, 500, 697, UKI
+English (United States and Canada), IBM037, 37, 697, USB
+English (United States and Canada) MNCS, IBM500, 500, 697, USI

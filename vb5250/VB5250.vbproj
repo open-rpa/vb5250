@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CD37B55C-985B-4E61-85AD-218CDA6988EB}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>VB5250.My.MyApplication</StartupObject>
+    <RootNamespace>VB5250</RootNamespace>
+    <AssemblyName>VB5250</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>VB5250.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>VB5250.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>VB5250.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>VB5250.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icons\computersystemproduct.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>packages\NLog.4.6.6\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="classSimpleCrypto.vb" />
+    <Compile Include="ColorPicker\classColorPickerComboBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="classConnectionINIEntry.vb" />
+    <Compile Include="classConnectionSettings.vb" />
+    <Compile Include="classDoubleBufferedPanel.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="classEmulatorTextBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="classConnectionTreeNode.vb" />
+    <Compile Include="classWinAPI.vb" />
+    <Compile Include="frmLogon.Designer.vb">
+      <DependentUpon>frmLogon.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmLogon.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFontPrefs.Designer.vb">
+      <DependentUpon>frmFontPrefs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmFontPrefs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmConnectionManager.Designer.vb">
+      <DependentUpon>frmConnectionManager.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmConnectionManager.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmColorPrefs.Designer.vb">
+      <DependentUpon>frmColorPrefs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmColorPrefs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEmulatorPopup.Designer.vb">
+      <DependentUpon>frmEmulatorPopup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmEmulatorPopup.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEmulatorView.Designer.vb">
+      <DependentUpon>frmEmulatorView.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmEmulatorView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPasswordChange.designer.vb">
+      <DependentUpon>frmPasswordChange.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPasswordChange.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="modGlobals.vb" />
+    <Compile Include="modEmulator.vb" />
+    <Compile Include="modiAccess.vb" />
+    <Compile Include="modINIFile.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmLogon.resx">
+      <DependentUpon>frmLogon.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFontPrefs.resx">
+      <DependentUpon>frmFontPrefs.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmColorPrefs.resx">
+      <DependentUpon>frmColorPrefs.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmConnectionManager.resx">
+      <DependentUpon>frmConnectionManager.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEmulatorPopup.resx">
+      <DependentUpon>frmEmulatorPopup.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEmulatorView.resx">
+      <DependentUpon>frmEmulatorView.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPasswordChange.resx">
+      <DependentUpon>frmPasswordChange.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Advanced Installer\FreeSoftware.rtf" />
+    <None Include="Advanced Installer\setup.aip" />
+    <None Include="My Project\app.manifest" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="App.config" />
+    <None Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IBM5250\IBM5250.vbproj">
+      <Project>{d5119654-5000-4ed0-a04d-6dd7f6bddd45}</Project>
+      <Name>IBM5250</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IBMiClient\IBMiClient\IBMiClient.vbproj">
+      <Project>{D0304C57-1E72-45C1-A836-D0C98880DEC8}</Project>
+      <Name>IBMiClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Telnet\Telnet.vbproj">
+      <Project>{226c3783-97d2-4db4-9c6a-f88567376874}</Project>
+      <Name>Telnet</Name>
+    </ProjectReference>
+    <ProjectReference Include="NSspi\NSspi.csproj">
+      <Project>{4b4cd933-bf62-4f92-b8fa-6771758c5197}</Project>
+      <Name>NSspi</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Icons\computersystemproduct.ico" />
+    <Content Include="Icons\VB5250_Connection_16x16.ico" />
+    <Content Include="Icons\VB5250_Connection_16x16.png" />
+    <Content Include="Icons\VB5250_NewConnection16x16.png" />
+    <Content Include="LICENSE.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="README.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

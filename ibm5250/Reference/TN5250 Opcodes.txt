@@ -1,0 +1,35 @@
+﻿Date: Thu, 9 Dec 1999 09:37:45 -0800
+Sender: owner-tn3270e@list.nih.gov
+From: Barry Hansen <barryh@wrq.com>
+To: "TN3270E@LIST.NIH.GOV" <TN3270E@LIST.NIH.GOV>
+Subject: Re: 5250 Data Stream Operation Codes
+
+I wish to point out the opcode list in that document is sadly incomplete and
+out of date. You will want to consider handling a more complete set, like
+this:
+
+    x00  No operation
+    x01  Invite op
+    x02  Put
+    x03  Put-then-Get
+    x04  Save screen
+    x05  Restore screen
+    x06  Read immediate
+    x07  Read mod immediate alt
+    x08  Read screen
+    x09  Internally generated Put (not used in DSPT)
+    x0A  Cancel invite
+    x0B  Turn on MSG light
+    x0C  Turn off MSG light
+    x0D  Read screen with extd attributes
+    x0E  Read screen to print
+    x0F  Read screen to print extd attributes
+    x10  Read screen to print with gridline
+    x11  Read screen to print with gridline with extd attributes
+
+Sorry but I don't know of any documentation on op codes. As far as I know,
+none exists. I hope someone can prove me wrong.
+
+Good luck, Barry Hansen
+barryh@wrq.com
+WRQ Inc., makers of Reflection, Express and Apptrieve

@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2010
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Telnet", "Telnet.vbproj", "{226C3783-97D2-4DB4-9C6A-F88567376874}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "IBMiClient", "..\IBMiClient\IBMiClient\IBMiClient.vbproj", "{D0304C57-1E72-45C1-A836-D0C98880DEC8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{226C3783-97D2-4DB4-9C6A-F88567376874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{226C3783-97D2-4DB4-9C6A-F88567376874}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{226C3783-97D2-4DB4-9C6A-F88567376874}.Debug|x86.ActiveCfg = Debug|x86
+		{226C3783-97D2-4DB4-9C6A-F88567376874}.Debug|x86.Build.0 = Debug|x86
+		{226C3783-97D2-4DB4-9C6A-F88567376874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{226C3783-97D2-4DB4-9C6A-F88567376874}.Release|Any CPU.Build.0 = Release|Any CPU
+		{226C3783-97D2-4DB4-9C6A-F88567376874}.Release|x86.ActiveCfg = Release|x86
+		{226C3783-97D2-4DB4-9C6A-F88567376874}.Release|x86.Build.0 = Release|x86
+		{D0304C57-1E72-45C1-A836-D0C98880DEC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0304C57-1E72-45C1-A836-D0C98880DEC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0304C57-1E72-45C1-A836-D0C98880DEC8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D0304C57-1E72-45C1-A836-D0C98880DEC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0304C57-1E72-45C1-A836-D0C98880DEC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0304C57-1E72-45C1-A836-D0C98880DEC8}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
