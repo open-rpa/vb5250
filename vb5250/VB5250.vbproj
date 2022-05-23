@@ -80,7 +80,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>packages\NLog.4.6.6\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.6.6\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -250,13 +250,13 @@
       <Project>{D0304C57-1E72-45C1-A836-D0C98880DEC8}</Project>
       <Name>IBMiClient</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NSspi\NSspi.csproj">
+      <Project>{4b4cd933-bf62-4f92-b8fa-6771758c5197}</Project>
+      <Name>NSspi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Telnet\Telnet.vbproj">
       <Project>{226c3783-97d2-4db4-9c6a-f88567376874}</Project>
       <Name>Telnet</Name>
-    </ProjectReference>
-    <ProjectReference Include="NSspi\NSspi.csproj">
-      <Project>{4b4cd933-bf62-4f92-b8fa-6771758c5197}</Project>
-      <Name>NSspi</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
